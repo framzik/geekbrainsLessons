@@ -1,4 +1,4 @@
-package ru.khrebtov.lesson1;
+package ru.khrebtov.lesson2;
 
 public class Main {
 
