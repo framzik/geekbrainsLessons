@@ -5,14 +5,14 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
-    private static final int SIZE = 5;
-    public static int DOTS_TO_WIN = 4;
+    private static final int SIZE = 3;
+    public static int DOTS_TO_WIN = 3;
     private static final String DOT_EMPTY = ".";
     private static final String DOT_X = "X";
     private static final String DOT_O = "O";
     private static String[][] map;
     private static Scanner scanner = new Scanner(System.in);
-    private static Random random = new Random();
+    private static final Random random = new Random();
 
     public static void main(String[] args) {
         initMap();
@@ -39,6 +39,7 @@ public class Main {
                 break;
             }
         }
+        scanner.close();
         System.out.println("Конец игры!");
     }
 
@@ -55,20 +56,34 @@ public class Main {
     }
 
     private static boolean checkWinByLoop(String dot) {
-        return chekRows(dot) | chekColumn(dot) | chekDiagonal(dot);
+        for (int i = 0; i < SIZE - DOTS_TO_WIN + 1; i++) {
+            for (int j = 0; j < SIZE - DOTS_TO_WIN + 1; j++) {
+                if (checkDiagonal(dot, i, j) | chekColumn(dot, i, j) | chekRows(dot, i, j)) return true;
+            }
+        }
+        return false;
     }
 
     //Диагональ
-    public static boolean chekDiagonal(String dot) {
+    public static boolean checkDiagonal(String dot, int offsetX, int offsetY) {
         int countDot = 0;
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                if (i == j) {
-                    if (map[i][j].equals(dot)) {
+        for (int i = 0; i < DOTS_TO_WIN; i++) {
+            if (map[i + offsetX][i + offsetY].equals(dot)) {
+                countDot++;
+                if (countDot == DOTS_TO_WIN) {
+                    return true;
+                }
+            }
+        }
+        countDot = 0;
+        for (int i = 0; i < DOTS_TO_WIN; i++) {
+            for (int j = 0; j < DOTS_TO_WIN; j++) {
+                if (j == DOTS_TO_WIN - i - 1) {
+                    if (map[i + offsetX][j + offsetY].equals(dot)) {
                         countDot++;
-                        if (countDot == DOTS_TO_WIN) {
-                            return true;
-                        }
+                    }
+                    if (countDot == DOTS_TO_WIN) {
+                        return true;
                     }
                 }
             }
@@ -77,11 +92,11 @@ public class Main {
     }
 
     //Строки
-    public static boolean chekRows(String dot) {
+    public static boolean chekRows(String dot, int offsetX, int offsetY) {
         int countDot = 0;
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                if (map[i][j].equals(dot)) {
+        for (int i = 0; i < DOTS_TO_WIN; i++) {
+            for (int j = 0; j < DOTS_TO_WIN; j++) {
+                if (map[i + offsetX][j + offsetY].equals(dot)) {
                     countDot++;
                     if (countDot == DOTS_TO_WIN) {
                         return true;
@@ -94,11 +109,11 @@ public class Main {
     }
 
     //Столбцы
-    public static boolean chekColumn(String dot) {
+    public static boolean chekColumn(String dot, int offsetX, int offsetY) {
         int countDot = 0;
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                if (map[j][i].equals(dot)) {
+        for (int i = 0; i < DOTS_TO_WIN; i++) {
+            for (int j = 0; j < DOTS_TO_WIN; j++) {
+                if (map[j + offsetY][i + offsetX].equals(dot)) {
                     countDot++;
                     if (countDot == DOTS_TO_WIN) {
                         return true;
@@ -107,22 +122,6 @@ public class Main {
             }
             countDot = 0;
         }
-        return false;
-    }
-
-    private static boolean checkWin(String dot) {
-        //Строки
-        if (map[0][0] == dot && map[1][0] == dot && map[2][0] == dot) return true;
-        if (map[0][1] == dot && map[1][1] == dot && map[2][1] == dot) return true;
-        if (map[0][2] == dot && map[1][2] == dot && map[2][2] == dot) return true;
-        //Столбцы
-        if (map[0][0] == dot && map[0][1] == dot && map[0][2] == dot) return true;
-        if (map[1][0] == dot && map[1][1] == dot && map[1][2] == dot) return true;
-        if (map[2][0] == dot && map[2][1] == dot && map[2][2] == dot) return true;
-        //Диагонали
-        if (map[0][0] == dot && map[1][1] == dot && map[2][2] == dot) return true;
-        if (map[2][0] == dot && map[1][1] == dot && map[0][2] == dot) return true;
-
         return false;
     }
 
@@ -156,7 +155,7 @@ public class Main {
         if (x < 0 || x >= SIZE || y < 0 || y >= SIZE) {
             return false;
         }
-        if (map[y][x] == DOT_EMPTY) {
+        if (map[y][x].equals(DOT_EMPTY)) {
             return true;
         }
         return false;
