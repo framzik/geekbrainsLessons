@@ -3,6 +3,7 @@ package ru.khrebtov.lesson8;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -143,8 +144,87 @@ public class MyFrame extends JFrame {
     setVisible(true);
   }
 
+  private Double calculate(String text) {
+    double answer = 0d;
+    ArrayList<Character> mathSymbols = new ArrayList<>();
+    for (int i = 0; i < text.length() - 1; i++) {
+      char c = text.charAt(i);
+      if (c == '-' || c == '+' || c == '*' || c == '/') {
+        mathSymbols.add(c);
+      }
+    }
+    //если 1 операция в строке
+    if (mathSymbols.size() <= 1) {
+      answer = calculating(text);
+    } else {
+      for (int i = 0; i <= mathSymbols.size() - 1; i++) {
+        if (mathSymbols.get(i).equals('*') || mathSymbols.get(i).equals('/')) {
+          //если * или / не первое и не последнее действие в строке
+          if (i != 0 && i != mathSymbols.size() - 1) {
+            //определяем индекс предыдущего знака и последующего
+            char firstSymbol = mathSymbols.get(i - 1);
+            char nextSymbol = mathSymbols.get(i + 1);
+
+            String forFirstIndex = text.substring(0, text.lastIndexOf(firstSymbol) + 1);
+            String forNextIndex = text.substring(text.indexOf(nextSymbol) + 1);
+
+            int firstIndex = forFirstIndex.lastIndexOf(firstSymbol) + 1;
+            int nextIndex = forNextIndex.indexOf(nextSymbol);
+            // 1-это сам символ * или /
+            int lastIndex = nextIndex + text.length() - forNextIndex.length();
+            String s = text.substring(firstIndex, lastIndex);
+            double someAnswer = calculating(s);
+            String nextStep = text.substring(0, firstIndex) + someAnswer + text
+                .substring(nextIndex + firstIndex + 2);
+            answer = calculate(nextStep);
+            break;
+            //если * или / первое в строке
+          } else if (i == 0) {
+            //определяем индекс  последующего знака
+            char nextSymbol = mathSymbols.get(i + 1);
+            String forNextIndex = text.substring(text.indexOf(nextSymbol) + 1);
+            int firstIndex = 0;
+            int nextIndex = forNextIndex.indexOf(nextSymbol);
+            if (nextIndex == -1) {
+              forNextIndex = text.substring(text.indexOf(nextSymbol));
+              nextIndex = forNextIndex.indexOf(nextSymbol);
+            }
+            // 1-это сам символ * или /
+            int lastIndex = nextIndex + text.length() - forNextIndex.length();
+            String s = text.substring(firstIndex, lastIndex);
+            double someAnswer = calculating(s);
+            String nextStep = someAnswer + text.substring(
+                lastIndex);
+            answer = calculate(nextStep);
+            break;
+            //если * или / последний в строке
+          } else if (i == mathSymbols.size() - 1) {
+            //определяем индекс предыдущего знака и последующего
+            String forFirstIndex = text.substring(0, text.indexOf(mathSymbols.get(i)));
+            char firstSymbol = mathSymbols.get(i - 1);
+            int firstIndex = forFirstIndex.lastIndexOf(firstSymbol) + 1;
+            // 1-это сам символ * или /
+            String s = text.substring(firstIndex);
+            double someAnswer = calculating(s);
+            String nextStep = text.substring(0, firstIndex) + someAnswer;
+            answer = calculate(nextStep);
+            break;
+          }
+        } else {
+          answer = calculating(text);
+        }
+      }
+    }
+    return answer;
+  }
+
   private double calculating(ActionEvent e) {
     String text = textField.getText();
+    return calculating(text);
+  }
+
+  private double calculating(String text) {
+
     StringBuilder digit = new StringBuilder();
     for (int i = 0; i < text.length(); i++) {
       char c = text.charAt(i);
