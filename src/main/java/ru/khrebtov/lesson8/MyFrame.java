@@ -220,7 +220,7 @@ public class MyFrame extends JFrame {
 
   private double calculating(ActionEvent e) {
     String text = textField.getText();
-    return calculating(text);
+    return calculate(text);
   }
 
   private double calculating(String text) {
